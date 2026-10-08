@@ -1,0 +1,1711 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="I_sRxGtcZTKuMO_ud_RSxawu77HChG77IcbRzs3rbcQ" />
+    <title>المنصة التعليمية المتكاملة</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Toast Notification Alert -->
+    <div id="publishToast" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 hidden bg-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-2xl"></i>
+        <div>
+            <h4 class="font-bold text-sm" id="publishToastTitle">تمت العملية بنجاح!</h4>
+            <p id="publishToastMsg" class="text-xs opacity-90"></p>
+        </div>
+    </div>
+
+    <!-- Header / Navigation -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <i class="fa-solid fa-graduation-cap text-3xl text-indigo-400"></i>
+                <span class="font-extrabold text-xl tracking-wide">منصتي التعليمية</span>
+            </div>
+
+            <div id="userInfoHeader" class="hidden flex items-center space-x-4 space-x-reverse">
+                <span id="userBadge" class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-700 text-indigo-100"></span>
+                <span id="userNameHeader" class="font-bold text-sm"></span>
+                <button onclick="logout()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg transition duration-200">
+                    <i class="fa-solid fa-right-from-bracket ml-1"></i> خروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+
+        <!-- Auth View (Login / Register) -->
+        <div id="authSection" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 my-8">
+            <div class="flex border-b border-gray-200 bg-gray-50">
+                <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-4 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white">تسجيل الدخول</button>
+                <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-4 text-center font-bold text-gray-500 hover:text-indigo-600">حساب جديد</button>
+            </div>
+
+            <div class="p-6">
+                <!-- LOGIN FORM -->
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">دور المستخدم</label>
+                        <select id="loginRole" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="student">طالب</option>
+                            <option value="teacher">معلم</option>
+                            <option value="assistant">مساعد معلم</option>
+                            <option value="admin">صاحب المنصة (المدير)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل</label>
+                        <input type="text" id="loginName" required placeholder="أدخل اسمك المسجل" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
+                        <input type="password" id="loginPassword" required placeholder="أدخل كلمة المرور الخاصة بك" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition duration-200">
+                        دخول المنصة
+                    </button>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل</label>
+                        <input type="text" id="regName" required placeholder="أدخل اسمك الثلاثي" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
+                        <input type="password" id="regPassword" required placeholder="أنشئ كلمة مرور لحسابك" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">اختر الدور</label>
+                        <select id="regRole" onchange="handleRoleSelectionChange()" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="teacher">معلم</option>
+                            <option value="assistant">مساعد معلم</option>
+                            <option value="student">طالب</option>
+                        </select>
+                    </div>
+
+                    <!-- Subjects Multi-Select for Teacher -->
+                    <div id="teacherSubjectsContainer" class="hidden">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">المواد التي تدرسها (اختر واحدة أو أكثر)</label>
+                        <select id="regTeacherSubjectsSelect" multiple class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none h-28">
+                            <option value="اللغة العربية">اللغة العربية</option>
+                            <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+                            <option value="الرياضيات">الرياضيات</option>
+                            <option value="العلوم">العلوم</option>
+                            <option value="الفيزياء">الفيزياء</option>
+                            <option value="الكيمياء">الكيمياء</option>
+                            <option value="الأحياء">الأحياء</option>
+                            <option value="الدراسات الاجتماعية">الدراسات الاجتماعية</option>
+                            <option value="التاريخ">التاريخ</option>
+                            <option value="الجغرافيا">الجغرافيا</option>
+                            <option value="الفلسفة والمنطق">الفلسفة والمنطق</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">اضغط باستمرار على Ctrl/Cmd لاختيار أكثر من مادة.</p>
+                    </div>
+
+                    <!-- Grade Level Selection for Student -->
+                    <div id="gradeSelectContainer" class="hidden">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">المرحلة الدراسية</label>
+                        <select id="regGradeSelect" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <optgroup label="المرحلة الابتدائية">
+                                <option value="الأول الابتدائي">الصف الأول الابتدائي</option>
+                                <option value="الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                <option value="الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                <option value="الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                <option value="الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                <option value="السادس الابتدائي">الصف السادس الابتدائي</option>
+                            </optgroup>
+                            <optgroup label="المرحلة الإعدادية">
+                                <option value="الأول الإعدادي">الصف الأول الإعدادي</option>
+                                <option value="الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                                <option value="الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                            </optgroup>
+                            <optgroup label="المرحلة الثانوية">
+                                <option value="الأول الثانوي">الصف الأول الثانوي</option>
+                                <option value="الثاني الثانوي">الصف الثاني الثانوي</option>
+                                <option value="الثالث الثانوي">الصف الثالث الثانوي</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Student Select Subject then Teacher -->
+                    <div id="studentSubjectTeacherContainer" class="hidden space-y-3">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">اختر المادة الدراسية المراد التسجيل بها</label>
+                            <select id="regStudentSubjectSelect" onchange="populateStudentTeacherSelect()" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="">-- اختر المادة أولاً --</option>
+                                <option value="اللغة العربية">اللغة العربية</option>
+                                <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+                                <option value="الرياضيات">الرياضيات</option>
+                                <option value="العلوم">العلوم</option>
+                                <option value="الفيزياء">الفيزياء</option>
+                                <option value="الكيمياء">الكيمياء</option>
+                                <option value="الأحياء">الأحياء</option>
+                                <option value="الدراسات الاجتماعية">الدراسات الاجتماعية</option>
+                                <option value="التاريخ">التاريخ</option>
+                                <option value="الجغرافيا">الجغرافيا</option>
+                                <option value="الفلسفة والمنطق">الفلسفة والمنطق</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">اختر المعلمين لهذه المادة (يمكن اختيار معلم أو أكثر)</label>
+                            <select id="regStudentTeachersSelect" multiple class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none h-28"></select>
+                            <p id="noTeacherMsg" class="text-xs text-red-500 mt-1 hidden">لا يوجد معلمون معتمدون لهذه المادة حالياً.</p>
+                        </div>
+                    </div>
+
+                    <!-- Select Teacher Field for Assistant -->
+                    <div id="teacherSelectContainer" class="hidden">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">اختر المعلم للربط معه</label>
+                        <select id="regTeacherSelect" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"></select>
+                        <p id="noTeacherMsgAss" class="text-xs text-red-500 mt-1 hidden">لا يوجد معلمون معتمدون حالياً في المنصة.</p>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition duration-200">
+                        إنشاء حساب
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- DASHBOARDS -->
+        <div id="dashboardSection" class="hidden space-y-6">
+
+            <!-- Profile Update Section -->
+            <div id="userProfileSettingsBox" class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-indigo-600"></i> إعدادات الحساب والشخصية
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <form onsubmit="changeUserName(event)" class="space-y-3 bg-gray-50 p-4 rounded-xl border">
+                        <h4 class="font-bold text-sm text-gray-700 flex items-center gap-1">
+                            <i class="fa-solid fa-signature text-indigo-500"></i> تعديل الاسم
+                        </h4>
+                        <input type="text" id="newUserNameInput" required placeholder="الاسم الجديد" class="w-full p-2.5 border rounded-xl text-sm">
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-sm">
+                            حفظ الاسم الجديد
+                        </button>
+                    </form>
+
+                    <form onsubmit="changeUserPassword(event)" class="space-y-3 bg-gray-50 p-4 rounded-xl border">
+                        <h4 class="font-bold text-sm text-gray-700 flex items-center gap-1">
+                            <i class="fa-solid fa-key text-indigo-500"></i> تغيير كلمة المرور
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="password" id="currUserPass" required placeholder="كلمة المرور الحالية" class="p-2.5 border rounded-xl text-sm">
+                            <input type="password" id="newUserPass" required placeholder="كلمة المرور الجديدة" class="p-2.5 border rounded-xl text-sm">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-sm">
+                            حفظ كلمة المرور الجديدة
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Extra Setting for Student: Change Grade Level -->
+                <div id="studentGradeChangeBox" class="mt-4 hidden bg-amber-50 p-4 rounded-xl border border-amber-200">
+                    <form onsubmit="changeStudentGrade(event)" class="flex flex-col sm:flex-row items-center gap-4">
+                        <div class="flex-1 w-full">
+                            <label class="block text-xs font-bold text-amber-900 mb-1">المرحلة الدراسية الحالية:</label>
+                            <select id="editStudentGradeSelect" class="w-full p-2.5 border rounded-xl text-sm bg-white">
+                                <optgroup label="المرحلة الابتدائية">
+                                    <option value="الأول الابتدائي">الصف الأول الابتدائي</option>
+                                    <option value="الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                    <option value="الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                    <option value="الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                    <option value="الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                    <option value="السادس الابتدائي">الصف السادس الابتدائي</option>
+                                </optgroup>
+                                <optgroup label="المرحلة الإعدادية">
+                                    <option value="الأول الإعدادي">الصف الأول الإعدادي</option>
+                                    <option value="الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                                    <option value="الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                                </optgroup>
+                                <optgroup label="المرحلة الثانوية">
+                                    <option value="الأول الثانوي">الصف الأول الثانوي</option>
+                                    <option value="الثاني الثانوي">الصف الثاني الثانوي</option>
+                                    <option value="الثالث الثانوي">الصف الثالث الثانوي</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full sm:w-auto mt-4 sm:mt-0 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm">
+                            تحديث المرحلة
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ADMIN DASHBOARD -->
+            <div id="adminDash" class="hidden space-y-6">
+                <div class="bg-amber-50 border-r-4 border-amber-500 p-4 rounded-xl shadow-sm flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-900">لوحة تحكم صاحب المنصة (Admin)</h2>
+                        <p class="text-sm text-amber-700">متابعة إحصائيات المعلمين، المساعدين والطلاب، وإدارة الحسابات.</p>
+                    </div>
+                    <i class="fa-solid fa-user-shield text-3xl text-amber-500"></i>
+                </div>
+
+                <!-- Admin Stats Counter -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-indigo-100 rounded-2xl text-indigo-600 text-2xl">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">إجمالي المعلمين المفعلين</p>
+                            <h3 id="adminTotalTeachers" class="text-2xl font-extrabold text-indigo-900">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-teal-100 rounded-2xl text-teal-600 text-2xl">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">إجمالي المساعدين</p>
+                            <h3 id="adminTotalAssistants" class="text-2xl font-extrabold text-teal-900">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-emerald-100 rounded-2xl text-emerald-600 text-2xl">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">إجمالي الطلاب في المنصة</p>
+                            <h3 id="adminTotalStudents" class="text-2xl font-extrabold text-emerald-900">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">طلبات المعلمين للانضمام (معلقة)</h3>
+                    <div id="pendingTeachersList" class="space-y-3"></div>
+                </div>
+
+                <!-- Admin View All Teachers, Assistants, Students -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
+                    <h3 class="text-lg font-bold text-gray-800 border-b pb-2">سجل مستخدمي المنصة (المعلمين، المساعدين، والطلاب)</h3>
+
+                    <div>
+                        <h4 class="font-bold text-sm text-indigo-900 mb-2"><i class="fa-solid fa-chalkboard-user ml-1"></i> المعلمون المفعلون</h4>
+                        <div id="adminTeachersList" class="space-y-2"></div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-sm text-teal-900 mb-2"><i class="fa-solid fa-user-gear ml-1"></i> المساعدون</h4>
+                        <div id="adminAssistantsList" class="space-y-2"></div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-sm text-emerald-900 mb-2"><i class="fa-solid fa-user-graduate ml-1"></i> الطلاب</h4>
+                        <div id="adminStudentsList" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHER DASHBOARD -->
+            <div id="teacherDash" class="hidden space-y-6">
+                <div class="bg-indigo-50 border-r-4 border-indigo-600 p-4 rounded-xl shadow-sm flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-indigo-900">لوحة تحكم المعلم</h2>
+                        <p class="text-sm text-indigo-700">متابعة المساعدين والطلاب، قبول طلبات الانضمام، ورفع/حذف الدروس والامتحانات.</p>
+                    </div>
+                    <!-- Teacher Stats (Assistants & Students Counts) -->
+                    <div class="flex gap-3">
+                        <div class="bg-white px-4 py-2 rounded-2xl shadow border border-indigo-100 flex items-center gap-2">
+                            <i class="fa-solid fa-user-gear text-teal-600 text-xl"></i>
+                            <div>
+                                <p class="text-[10px] text-gray-500 font-bold">المساعدون لديك</p>
+                                <h4 id="teacherTotalAssistants" class="text-lg font-extrabold text-teal-900">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white px-4 py-2 rounded-2xl shadow border border-indigo-100 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-indigo-600 text-xl"></i>
+                            <div>
+                                <p class="text-[10px] text-gray-500 font-bold">الطلاب لديك</p>
+                                <h4 id="teacherTotalStudents" class="text-lg font-extrabold text-indigo-900">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex border-b border-gray-200 gap-4">
+                    <button onclick="switchStaffTab('approvals')" id="tTabAppr" class="py-2 px-4 border-b-2 border-indigo-600 font-bold text-indigo-600">المساعدون والطلاب</button>
+                    <button onclick="switchStaffTab('content')" id="tTabCont" class="py-2 px-4 font-bold text-gray-500">رفع/حذف المحتوى</button>
+                    <button onclick="switchStaffTab('exams')" id="tTabExams" class="py-2 px-4 font-bold text-gray-500">الامتحانات والاختبارات</button>
+                </div>
+
+                <div id="staffApprovalsSection" class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4 text-indigo-900">طلبات انضمام المساعدين المعلقة</h3>
+                        <div id="teacherPendingAssistants" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Pending Student Requests -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md border-r-4 border-amber-500">
+                        <h3 class="text-lg font-bold mb-4 text-indigo-900 flex items-center gap-2">
+                            <i class="fa-solid fa-user-clock text-amber-500"></i> طلبات انضمام الطلاب المعلقة (القبول المباشر بواسطة المعلم)
+                        </h3>
+                        <div id="teacherPendingStudents" class="space-y-3"></div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4 text-indigo-900">المساعدون المفعلون لديك (إمكانية حذف المساعد)</h3>
+                        <div id="teacherActiveAssistants" class="space-y-3"></div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4 text-indigo-900">الطلاب المقيدون لديك (إمكانية حذف الطالب)</h3>
+                        <div id="teacherActiveStudents" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <div id="staffContentSection" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4">نشر درس جديد (صورة أو فيديو)</h3>
+                        <form onsubmit="handleUploadContent(event)" class="space-y-4">
+                            <input type="text" id="contentTitle" required placeholder="عنوان الدرس أو الشرح" class="w-full p-3 border rounded-xl">
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold mb-1 text-gray-700">نوع المحتوى:</label>
+                                    <select id="contentType" class="w-full p-3 border rounded-xl">
+                                        <option value="video">فيديو</option>
+                                        <option value="image">صورة</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold mb-1 text-gray-700">المرحلة الدراسية المستهدفة:</label>
+                                    <select id="contentGrade" class="w-full p-3 border rounded-xl font-bold bg-amber-50">
+                                        <option value="جميع المراحل">جميع المراحل</option>
+                                        <optgroup label="المرحلة الابتدائية">
+                                            <option value="الأول الابتدائي">الصف الأول الابتدائي</option>
+                                            <option value="الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                            <option value="الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                            <option value="الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                            <option value="الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                            <option value="السادس الابتدائي">الصف السادس الابتدائي</option>
+                                        </optgroup>
+                                        <optgroup label="المرحلة الإعدادية">
+                                            <option value="الأول الإعدادي">الصف الأول الإعدادي</option>
+                                            <option value="الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                                            <option value="الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                                        </optgroup>
+                                        <optgroup label="المرحلة الثانوية">
+                                            <option value="الأول الثانوي">الصف الأول الثانوي</option>
+                                            <option value="الثاني الثانوي">الصف الثاني الثانوي</option>
+                                            <option value="الثالث الثانوي">الصف الثالث الثانوي</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-1">اختر الملف من جهازك/هاتفك:</label>
+                                <input type="file" id="contentFile" accept="image/*,video/*" class="w-full p-2 border rounded-xl">
+                            </div>
+
+                            <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700">نشر المحتوى الآن</button>
+                        </form>
+                    </div>
+
+                    <!-- Published Content Management List -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4 text-indigo-900">المحتوى المنشور حالياً (إمكانية الحذف)</h3>
+                        <div id="staffContentManageList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+                </div>
+
+                <div id="staffExamsSection" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4">إنشاء امتحان جديد</h3>
+                        <form onsubmit="handleCreateExam(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="examTitle" required placeholder="عنوان الامتحان" class="w-full p-3 border rounded-xl font-bold">
+                                <div>
+                                    <select id="examGrade" class="w-full p-3 border rounded-xl font-bold bg-amber-50">
+                                        <option value="جميع المراحل">موجّه لـ: جميع المراحل</option>
+                                        <optgroup label="المرحلة الابتدائية">
+                                            <option value="الأول الابتدائي">الصف الأول الابتدائي</option>
+                                            <option value="الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                            <option value="الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                            <option value="الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                            <option value="الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                            <option value="السادس الابتدائي">الصف السادس الابتدائي</option>
+                                        </optgroup>
+                                        <optgroup label="المرحلة الإعدادية">
+                                            <option value="الأول الإعدادي">الصف الأول الإعدادي</option>
+                                            <option value="الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                                            <option value="الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                                        </optgroup>
+                                        <optgroup label="المرحلة الثانوية">
+                                            <option value="الأول الثانوي">الصف الأول الثانوي</option>
+                                            <option value="الثاني الثانوي">الصف الثاني الثانوي</option>
+                                            <option value="الثالث الثانوي">الصف الثالث الثانوي</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="questionsContainer" class="space-y-6"></div>
+
+                            <div class="flex gap-3">
+                                <button type="button" onclick="addQuestionToForm()" class="flex-1 py-3 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold rounded-xl border border-indigo-300">
+                                    <i class="fa-solid fa-plus ml-1"></i> إضافة سؤال جديد
+                                </button>
+                                <button type="submit" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md">
+                                    <i class="fa-solid fa-paper-plane ml-1"></i> نشر الامتحان
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Published Exams Management List -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h3 class="text-lg font-bold mb-4 text-indigo-900">الامتحانات المنشورة حالياً (إمكانية الحذف)</h3>
+                        <div id="staffExamsManageList" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ASSISTANT DASHBOARD -->
+            <div id="assistantDash" class="hidden space-y-6">
+                <div class="bg-teal-50 border-r-4 border-teal-600 p-4 rounded-xl shadow-sm flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-teal-900">لوحة تحكم المساعد</h2>
+                        <p class="text-sm text-teal-700">قبول الطلاب وإدارتهم + نشر وحذف المحتوى والامتحانات.</p>
+                    </div>
+                    <!-- Assistant Total Students Count -->
+                    <div class="bg-white px-5 py-3 rounded-2xl shadow border border-teal-100 flex items-center gap-3">
+                        <i class="fa-solid fa-users text-teal-600 text-2xl"></i>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">إجمالي الطلاب المفعلين</p>
+                            <h4 id="assistantTotalStudents" class="text-xl font-extrabold text-teal-900">0</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assistant Pending Approval Warning Status -->
+                <div id="assistantPendingStatusBox" class="hidden bg-amber-50 border-r-4 border-amber-500 p-4 rounded-xl shadow-sm text-amber-900 font-bold flex items-center gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-2xl"></i>
+                    <div>
+                        <p class="text-sm">حسابك قيد المراجعة وبانتظار موافقة المعلم للربط معه.</p>
+                        <p class="text-xs text-amber-700 font-normal mt-0.5">لا يمكنك قبول الطلاب أو رفع المحتوى والامتحانات إلا بعد أن يوافق المعلم على طلب انضمامك كـ مساعد لديه.</p>
+                    </div>
+                </div>
+
+                <div id="assistantMainContent" class="space-y-6">
+                    <div class="flex border-b border-gray-200 gap-4">
+                        <button onclick="switchAssistantTab('students')" id="aTabStud" class="py-2 px-4 border-b-2 border-teal-600 font-bold text-teal-600">إدارة وموافقات الطلاب</button>
+                        <button onclick="switchAssistantTab('content')" id="aTabCont" class="py-2 px-4 font-bold text-gray-500">رفع/حذف المحتوى</button>
+                        <button onclick="switchAssistantTab('exams')" id="aTabExams" class="py-2 px-4 font-bold text-gray-500">إنشاء/حذف الامتحانات</button>
+                    </div>
+
+                    <!-- Assistant Student Approvals & Student Management -->
+                    <div id="assStudentsSection" class="space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-md">
+                            <h3 class="text-lg font-bold mb-4 text-teal-900">طلبات انضمام الطلاب المعلقة</h3>
+                            <div id="assistantPendingStudentsList" class="space-y-3"></div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-md">
+                            <h3 class="text-lg font-bold mb-4 text-teal-900">الطلاب المفعلون حالياً لدى المعلم (إمكانية حذف الطالب)</h3>
+                            <div id="assistantActiveStudentsList" class="space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Assistant Shared Publishing Sections -->
+                    <div id="assContentSection" class="hidden space-y-6"></div>
+                    <div id="assExamsSection" class="hidden space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- STUDENT DASHBOARD -->
+            <div id="studentDash" class="hidden space-y-6">
+                <div class="bg-emerald-50 border-r-4 border-emerald-600 p-4 rounded-xl shadow-sm flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-emerald-900">لوحة الطالب</h2>
+                        <p class="text-sm text-emerald-700">متابعة الشروحات، الصور، والفيديوهات والامتحانات الموجهة لمرحلتك الدراسية.</p>
+                    </div>
+                    <span id="studentGradeBadge" class="bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs"></span>
+                </div>
+
+                <!-- Request New Teacher Section -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-indigo-100 space-y-4">
+                    <h3 class="text-lg font-bold text-indigo-900 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-indigo-600"></i> إرسال طلب انضمام لمعلم جديد
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">اختر المادة الدراسية:</label>
+                            <select id="studentDashSubjectSelect" onchange="populateStudentDashTeacherSelect()" class="w-full p-2.5 border rounded-xl text-sm bg-gray-50">
+                                <option value="">-- اختر المادة --</option>
+                                <option value="اللغة العربية">اللغة العربية</option>
+                                <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+                                <option value="الرياضيات">الرياضيات</option>
+                                <option value="العلوم">العلوم</option>
+                                <option value="الفيزياء">الفيزياء</option>
+                                <option value="الكيمياء">الكيمياء</option>
+                                <option value="الأحياء">الأحياء</option>
+                                <option value="الدراسات الاجتماعية">الدراسات الاجتماعية</option>
+                                <option value="التاريخ">التاريخ</option>
+                                <option value="الجغرافيا">الجغرافيا</option>
+                                <option value="الفلسفة والمنطق">الفلسفة والمنطق</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">اختر المعلم:</label>
+                            <select id="studentDashTeacherSelect" class="w-full p-2.5 border rounded-xl text-sm bg-gray-50"></select>
+                        </div>
+
+                        <button onclick="sendNewTeacherRequest()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow">
+                            <i class="fa-solid fa-paper-plane ml-1"></i> إرسال الطلب
+                        </button>
+                    </div>
+                </div>
+
+                <div id="studentStatusCard" class="bg-white p-6 rounded-2xl shadow-md"></div>
+                <div id="studentLessonsList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <div id="studentExamsList" class="bg-white p-6 rounded-2xl shadow-md space-y-4"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal for Student Taking Exam -->
+    <div id="examModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 id="modalExamTitle" class="text-xl font-bold text-indigo-900"></h3>
+                <button onclick="closeExamModal()" class="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+            </div>
+            <div id="modalExamBody" class="space-y-6"></div>
+            <div class="flex justify-end gap-3 border-t pt-4">
+                <button onclick="closeExamModal()" class="px-5 py-2.5 rounded-xl border text-gray-600 font-bold">إلغاء</button>
+                <button onclick="submitExamAnswers()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">إنهاء وإرسال</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Initialize Real-time Synchronization Channel across browsers/devices
+    const syncChannel = new BroadcastChannel('edu_platform_sync_channel');
+
+    const defaultData = {
+      adminPassword: '12345',
+      adminName: 'صاحب المنصة',
+      users: [],
+      contents: [],
+      exams: [],
+      examResults: []
+    };
+
+    function getData() {
+      const data = localStorage.getItem('edu_platform_db');
+      return data ? JSON.parse(data) : defaultData;
+    }
+
+    function saveData(data, notifyOthers = true, msgText = '') {
+      localStorage.setItem('edu_platform_db', JSON.stringify(data));
+
+      // Notify other devices / tabs in real-time
+      if (notifyOthers) {
+        syncChannel.postMessage({
+          type: 'DATA_UPDATED',
+          message: msgText || 'تم تحديث البيانات في المنصة'
+        });
+      }
+    }
+
+    // Listen for real-time updates from other devices/tabs
+    syncChannel.onmessage = function(event) {
+      if (event.data && event.data.type === 'DATA_UPDATED') {
+        showToast(event.data.message || 'تم تحديث البيانات من جهاز آخر بنجاح!', 'تحديث لحظي فوري');
+        refreshCurrentView();
+      }
+    };
+
+    // Helper Function: Check if teacher has active assistants
+    function teacherHasAssistants(db, teacherId) {
+      return db.users.some(u => u.role === 'assistant' && u.teacherId === teacherId && u.teacherApproved);
+    }
+
+    let currentUser = null;
+    let activeExamTaking = null;
+
+    function showToast(message, title = 'تمت العملية بنجاح!') {
+      const toast = document.getElementById('publishToast');
+      document.getElementById('publishToastTitle').innerText = title;
+      document.getElementById('publishToastMsg').innerText = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    function refreshCurrentView() {
+      if (!currentUser) return;
+      const db = getData();
+
+      // Refresh currentUser object from latest database
+      if (currentUser.role !== 'admin') {
+        const updated = db.users.find(u => u.id === currentUser.id);
+        if (updated) currentUser = updated;
+      }
+
+      if (currentUser.role === 'admin') renderAdminDash();
+      else if (currentUser.role === 'teacher') {
+        renderTeacherDash();
+        renderManageContentAndExams();
+      } else if (currentUser.role === 'assistant') {
+        renderAssistantDash();
+        renderManageContentAndExams();
+      } else if (currentUser.role === 'student') {
+        renderStudentDash();
+      }
+    }
+
+    function switchAuthTab(tab) {
+      if(tab === 'login') {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-4 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white';
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-4 text-center font-bold text-gray-500 hover:text-indigo-600';
+      } else {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-4 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white';
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-4 text-center font-bold text-gray-500 hover:text-indigo-600';
+        handleRoleSelectionChange();
+      }
+    }
+
+    function handleRoleSelectionChange() {
+      const role = document.getElementById('regRole').value;
+      const tContainer = document.getElementById('teacherSelectContainer');
+      const gContainer = document.getElementById('gradeSelectContainer');
+      const tsContainer = document.getElementById('teacherSubjectsContainer');
+      const stContainer = document.getElementById('studentSubjectTeacherContainer');
+
+      if (role === 'student') {
+        tContainer.classList.add('hidden');
+        gContainer.classList.remove('hidden');
+        tsContainer.classList.add('hidden');
+        stContainer.classList.remove('hidden');
+      } else if (role === 'assistant') {
+        tContainer.classList.remove('hidden');
+        gContainer.classList.add('hidden');
+        tsContainer.classList.add('hidden');
+        stContainer.classList.add('hidden');
+        populateTeacherSelectForAssistant();
+      } else if (role === 'teacher') {
+        tContainer.classList.add('hidden');
+        gContainer.classList.add('hidden');
+        tsContainer.classList.remove('hidden');
+        stContainer.classList.add('hidden');
+      }
+    }
+
+    function populateStudentTeacherSelect() {
+      const db = getData();
+      const subject = document.getElementById('regStudentSubjectSelect').value;
+      const select = document.getElementById('regStudentTeachersSelect');
+      const msg = document.getElementById('noTeacherMsg');
+
+      select.innerHTML = '';
+      if (!subject) return;
+
+      const matchingTeachers = db.users.filter(u => u.role === 'teacher' && u.adminApproved && u.subjects && u.subjects.includes(subject));
+
+      if (matchingTeachers.length === 0) {
+        msg.classList.remove('hidden');
+        select.disabled = true;
+      } else {
+        msg.classList.add('hidden');
+        select.disabled = false;
+        matchingTeachers.forEach(t => {
+          select.innerHTML += `<option value="${t.id}">${t.name} (${t.subjects.join('، ')})</option>`;
+        });
+      }
+    }
+
+    function populateTeacherSelectForAssistant() {
+      const db = getData();
+      const approvedTeachers = db.users.filter(u => u.role === 'teacher' && u.adminApproved);
+      const select = document.getElementById('regTeacherSelect');
+      const msg = document.getElementById('noTeacherMsgAss');
+
+      select.innerHTML = '';
+      if (approvedTeachers.length === 0) {
+        msg.classList.remove('hidden');
+        select.disabled = true;
+      } else {
+        msg.classList.add('hidden');
+        select.disabled = false;
+        approvedTeachers.forEach(t => {
+          select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+        });
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const role = document.getElementById('regRole').value;
+
+      if (!name || !password) return alert('يرجى ملء كافة الحقول!');
+
+      const db = getData();
+      let teacherIds = [];
+      let teacherSubjects = [];
+
+      if (role === 'teacher') {
+        const selectedSubjects = Array.from(document.getElementById('regTeacherSubjectsSelect').selectedOptions).map(o => o.value);
+        if (selectedSubjects.length === 0) return alert('يرجى اختيار مادة واحدة على الأقل!');
+        teacherSubjects = selectedSubjects;
+      } else if (role === 'student') {
+        const selectedTeachers = Array.from(document.getElementById('regStudentTeachersSelect').selectedOptions).map(o => o.value);
+        if (selectedTeachers.length === 0) return alert('يرجى اختيار معلم واحد على الأقل للربط معه!');
+        teacherIds = selectedTeachers;
+      } else if (role === 'assistant') {
+        const tId = document.getElementById('regTeacherSelect').value;
+        if (!tId) return alert('يرجى اختيار معلم للربط معه!');
+        teacherIds = [tId];
+      }
+
+      const grade = document.getElementById('regGradeSelect').value;
+
+      let autoApprovedStudent = false;
+      if (role === 'student') {
+        const hasAnyAssistant = teacherIds.some(tId => teacherHasAssistants(db, tId));
+        if (!hasAnyAssistant) {
+          autoApprovedStudent = true;
+        }
+      }
+
+      const newUser = {
+        id: 'u_' + Date.now(),
+        name: name,
+        password: password,
+        role: role,
+        grade: role === 'student' ? grade : null,
+        subjects: role === 'teacher' ? teacherSubjects : [],
+        teacherIds: (role === 'student' || role === 'assistant') ? teacherIds : [],
+        teacherId: (role === 'assistant') ? teacherIds[0] : null,
+        adminApproved: role === 'teacher' ? false : true,
+        teacherApproved: false,
+        assistantApproved: role === 'student' ? autoApprovedStudent : false
+      };
+
+      db.users.push(newUser);
+      saveData(db, true, `تسجيل جديد: تم إضافة ${getRoleBadgeText(role)} جديد (${name})!`);
+
+      let regMsg = 'تم تسجيل الحساب بنجاح!';
+      if (role === 'student') {
+        regMsg = autoApprovedStudent
+          ? 'تم تسجيل الحساب وتفعيله تلقائياً بنجاح! يمكنك الآن تسجيل الدخول مباشرة.'
+          : 'تم تسجيل الحساب بنجاح! سينتظر حسابك موافقة المساعد أو المعلم لتفعيله.';
+      }
+      if (role === 'assistant') regMsg = 'تم تسجيل حساب المساعد بنجاح! سينتظر حسابك موافقة المعلم أولاً للتمكن من إدارة الطلاب ونشر المحتوى.';
+
+      alert(regMsg);
+      switchAuthTab('login');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const role = document.getElementById('loginRole').value;
+      const name = document.getElementById('loginName').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const db = getData();
+
+      if (role === 'admin') {
+        const adminName = db.adminName || 'صاحب المنصة';
+        if (password === db.adminPassword && (name === adminName || name === 'صاحب المنصة' || name === 'المدير')) {
+          currentUser = { role: 'admin', name: adminName };
+          showDashboard();
+        } else {
+          alert('اسم أو كلمة مرور المدير غير صحيحة!');
+        }
+        return;
+      }
+
+      const user = db.users.find(u => u.name === name && u.role === role);
+      if (!user) return alert('المستخدم غير موجود!');
+      if (user.password !== password) return alert('كلمة المرور غير صحيحة!');
+
+      currentUser = user;
+      showDashboard();
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('authSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('userInfoHeader').classList.add('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+      document.getElementById('userInfoHeader').classList.remove('hidden');
+
+      document.getElementById('userNameHeader').innerText = currentUser.name;
+      document.getElementById('userBadge').innerText = getRoleBadgeText(currentUser.role);
+      document.getElementById('newUserNameInput').value = currentUser.name;
+
+      if (currentUser.role === 'student') {
+        document.getElementById('studentGradeChangeBox').classList.remove('hidden');
+        document.getElementById('editStudentGradeSelect').value = currentUser.grade || 'الأول الابتدائي';
+        document.getElementById('studentGradeBadge').innerText = 'المرحلة: ' + (currentUser.grade || 'غير محددة');
+      } else {
+        document.getElementById('studentGradeChangeBox').classList.add('hidden');
+      }
+
+      ['adminDash', 'teacherDash', 'assistantDash', 'studentDash'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+
+      if (currentUser.role === 'admin') {
+        document.getElementById('adminDash').classList.remove('hidden');
+        renderAdminDash();
+      } else if (currentUser.role === 'teacher') {
+        document.getElementById('teacherDash').classList.remove('hidden');
+        renderTeacherDash();
+        renderManageContentAndExams();
+        resetExamBuilder();
+      } else if (currentUser.role === 'assistant') {
+        document.getElementById('assistantDash').classList.remove('hidden');
+        renderAssistantDash();
+        resetExamBuilder();
+      } else if (currentUser.role === 'student') {
+        document.getElementById('studentDash').classList.remove('hidden');
+        renderStudentDash();
+      }
+    }
+
+    function changeStudentGrade(e) {
+      e.preventDefault();
+      const newGrade = document.getElementById('editStudentGradeSelect').value;
+      const db = getData();
+      const u = db.users.find(x => x.id === currentUser.id);
+      if (u) {
+        u.grade = newGrade;
+        currentUser.grade = newGrade;
+        saveData(db, true, `قام الطالب (${currentUser.name}) بتغيير مرحلته الدراسية`);
+        alert('تم تحديث مرحلتك الدراسية بنجاح!');
+        showDashboard();
+      }
+    }
+
+    function changeUserName(e) {
+      e.preventDefault();
+      const newName = document.getElementById('newUserNameInput').value.trim();
+      if (!newName) return alert('يرجى إدخال اسم صحيح!');
+
+      const db = getData();
+      if (currentUser.role === 'admin') {
+        db.adminName = newName;
+        currentUser.name = newName;
+      } else {
+        const u = db.users.find(x => x.id === currentUser.id);
+        if (u) {
+          u.name = newName;
+          currentUser.name = newName;
+        }
+      }
+
+      saveData(db, true, `تم تحديث اسم مستخدم إلى: ${newName}`);
+      document.getElementById('userNameHeader').innerText = newName;
+      alert('تم تحديث الاسم بنجاح!');
+      showDashboard();
+    }
+
+    function changeUserPassword(e) {
+      e.preventDefault();
+      const curr = document.getElementById('currUserPass').value;
+      const next = document.getElementById('newUserPass').value;
+      const db = getData();
+
+      if (currentUser.role === 'admin') {
+        if (curr !== db.adminPassword) return alert('كلمة المرور الحالية غير صحيحة!');
+        db.adminPassword = next;
+        saveData(db, false);
+        alert('تم تغيير كلمة المرور بنجاح!');
+      } else {
+        const u = db.users.find(x => x.id === currentUser.id);
+        if (!u || u.password !== curr) return alert('كلمة المرور الحالية غير صحيحة!');
+        u.password = next;
+        currentUser.password = next;
+        saveData(db, false);
+        alert('تم تغيير كلمة المرور بنجاح!');
+      }
+
+      document.getElementById('currUserPass').value = '';
+      document.getElementById('newUserPass').value = '';
+    }
+
+    function getRoleBadgeText(role) {
+      if (role === 'admin') return 'مدير المنصة';
+      if (role === 'teacher') return 'معلم';
+      if (role === 'assistant') return 'مساعد معلم';
+      return 'طالب';
+    }
+
+    // ADMIN CONTROLS & STATS
+    function renderAdminDash() {
+      const db = getData();
+
+      // Pending Teachers List
+      const pendingList = document.getElementById('pendingTeachersList');
+      const pendingTeachers = db.users.filter(u => u.role === 'teacher' && !u.adminApproved);
+      pendingList.innerHTML = pendingTeachers.length === 0 ? '<p class="text-gray-400 text-sm">لا توجد طلبات معلمين معلقة.</p>' : '';
+
+      pendingTeachers.forEach(t => {
+        const subs = t.subjects ? t.subjects.join('، ') : 'غير محدد';
+        pendingList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
+            <div>
+              <span class="font-bold">${t.name}</span>
+              <span class="text-xs text-indigo-600 block">المواد: ${subs}</span>
+            </div>
+            <button onclick="approveTeacher('${t.id}')" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-bold">موافقة على المعلم</button>
+          </div>
+        `;
+      });
+
+      // Admin Lists for All Teachers, Assistants, Students
+      const adminTeachersList = document.getElementById('adminTeachersList');
+      const approvedTeachers = db.users.filter(u => u.role === 'teacher' && u.adminApproved);
+      adminTeachersList.innerHTML = approvedTeachers.length === 0 ? '<p class="text-gray-400 text-xs">لا يوجد معلمون مفعلون.</p>' : '';
+      approvedTeachers.forEach(t => {
+        adminTeachersList.innerHTML += `
+          <div class="flex items-center justify-between p-2.5 bg-indigo-50/50 rounded-xl border border-indigo-100 text-xs">
+            <span class="font-bold text-gray-800">${t.name} (${t.subjects ? t.subjects.join('، ') : 'بدون مادة'})</span>
+            <button onclick="deleteUserByAdmin('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg font-bold">حذف المعلم</button>
+          </div>
+        `;
+      });
+
+      const adminAssistantsList = document.getElementById('adminAssistantsList');
+      const assistants = db.users.filter(u => u.role === 'assistant');
+      adminAssistantsList.innerHTML = assistants.length === 0 ? '<p class="text-gray-400 text-xs">لا يوجد مساعدون مسجلون.</p>' : '';
+      assistants.forEach(a => {
+        const teacherObj = db.users.find(t => t.id === a.teacherId);
+        adminAssistantsList.innerHTML += `
+          <div class="flex items-center justify-between p-2.5 bg-teal-50/50 rounded-xl border border-teal-100 text-xs">
+            <span class="font-bold text-gray-800">${a.name} (مساعد للمعلم: ${teacherObj ? teacherObj.name : 'غير محدد'}) - ${a.teacherApproved ? 'مفعل' : 'غير مفعل'}</span>
+            <button onclick="deleteUserByAdmin('${a.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg font-bold">حذف المساعد</button>
+          </div>
+        `;
+      });
+
+      const adminStudentsList = document.getElementById('adminStudentsList');
+      const students = db.users.filter(u => u.role === 'student');
+      adminStudentsList.innerHTML = students.length === 0 ? '<p class="text-gray-400 text-xs">لا يوجد طلاب مسجلون.</p>' : '';
+      students.forEach(s => {
+        adminStudentsList.innerHTML += `
+          <div class="flex items-center justify-between p-2.5 bg-emerald-50/50 rounded-xl border border-emerald-100 text-xs">
+            <span class="font-bold text-gray-800">${s.name} (${s.grade || 'بدون مرحلة'})</span>
+            <button onclick="deleteUserByAdmin('${s.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg font-bold">حذف الطالب</button>
+          </div>
+        `;
+      });
+
+      // Update Counts for Admin
+      document.getElementById('adminTotalTeachers').innerText = approvedTeachers.length;
+      document.getElementById('adminTotalAssistants').innerText = assistants.length;
+      document.getElementById('adminTotalStudents').innerText = students.length;
+    }
+
+    function approveTeacher(id) {
+      const db = getData();
+      const u = db.users.find(x => x.id === id);
+      if (u) {
+        u.adminApproved = true;
+        saveData(db, true, `تمت الموافقة على انضمام المعلم الجديد (${u.name})!`);
+        renderAdminDash();
+      }
+    }
+
+    function deleteUserByAdmin(id) {
+      if (!confirm('هل أنت تأكد من حذف هذا المستخدم نهائياً من المنصة؟')) return;
+      const db = getData();
+      db.users = db.users.filter(u => u.id !== id && u.teacherId !== id && (!u.teacherIds || !u.teacherIds.includes(id)));
+      saveData(db, true, 'تم تحديث قائمة المستخدمين وحذف مستخدم بواسطة مدير المنصة');
+      renderAdminDash();
+      showToast('تم حذف المستخدم بنجاح!');
+    }
+
+    // TEACHER DASHBOARD
+    function renderTeacherDash() {
+      const db = getData();
+
+      // Pending Assistants
+      const pendingAss = db.users.filter(u => u.role === 'assistant' && u.teacherId === currentUser.id && !u.teacherApproved);
+      const pendingList = document.getElementById('teacherPendingAssistants');
+      pendingList.innerHTML = pendingAss.length === 0 ? '<p class="text-gray-400 text-sm">لا توجد طلبات مساعدين معلقة.</p>' : '';
+
+      pendingAss.forEach(a => {
+        pendingList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
+            <span class="font-bold">${a.name}</span>
+            <div class="flex gap-2">
+              <button onclick="approveAssistant('${a.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">قبول المساعد</button>
+              <button onclick="deleteAssistantByTeacher('${a.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">حذف المساعد</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Pending Students List
+      const pendingStudents = db.users.filter(u => u.role === 'student' && (u.teacherIds && u.teacherIds.includes(currentUser.id) || u.teacherId === currentUser.id) && !u.assistantApproved);
+      const pendingStudList = document.getElementById('teacherPendingStudents');
+      pendingStudList.innerHTML = pendingStudents.length === 0 ? '<p class="text-gray-400 text-sm">لا توجد طلبات انضمام معلقة للطلاب.</p>' : '';
+
+      pendingStudents.forEach(s => {
+        pendingStudList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-amber-50/60 rounded-xl border border-amber-200">
+            <div>
+              <span class="font-bold text-gray-800">${s.name}</span>
+              <span class="text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full mr-2">${s.grade || 'غير محدد'}</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="approveStudentByTeacher('${s.id}')" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">موافقة وتفعيل الطالب</button>
+              <button onclick="deleteUserByTeacherOrAssistant('${s.id}')" class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">رفض وحذف</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Active Assistants
+      const activeAss = db.users.filter(u => u.role === 'assistant' && u.teacherId === currentUser.id && u.teacherApproved);
+      const activeList = document.getElementById('teacherActiveAssistants');
+      activeList.innerHTML = activeAss.length === 0 ? '<p class="text-gray-400 text-sm">لا يوجد مساعدون مفعلون معك حالياً (يمكنك إدارة المنصة وقبول الطلاب بنفسك).</p>' : '';
+
+      activeAss.forEach(a => {
+        activeList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
+            <span class="font-bold text-gray-800">${a.name}</span>
+            <button onclick="deleteAssistantByTeacher('${a.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
+              <i class="fa-solid fa-trash"></i> حذف المساعد
+            </button>
+          </div>
+        `;
+      });
+
+      // Active Students for Teacher
+      const myStudents = db.users.filter(u => u.role === 'student' && (u.teacherIds && u.teacherIds.includes(currentUser.id) || u.teacherId === currentUser.id) && u.assistantApproved);
+      const activeStudentsList = document.getElementById('teacherActiveStudents');
+      activeStudentsList.innerHTML = myStudents.length === 0 ? '<p class="text-gray-400 text-sm">لا يوجد طلاب مقيدون لديك حالياً.</p>' : '';
+
+      myStudents.forEach(s => {
+        activeStudentsList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
+            <div>
+              <span class="font-bold text-gray-800">${s.name}</span>
+              <span class="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full mr-2">${s.grade || 'غير محدد'}</span>
+            </div>
+            <button onclick="deleteUserByTeacherOrAssistant('${s.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">حذف الطالب</button>
+          </div>
+        `;
+      });
+
+      // Update Counts for Teacher
+      document.getElementById('teacherTotalAssistants').innerText = activeAss.length;
+      document.getElementById('teacherTotalStudents').innerText = myStudents.length;
+    }
+
+    function approveAssistant(id) {
+      const db = getData();
+      const u = db.users.find(x => x.id === id);
+      if (u) {
+        u.teacherApproved = true;
+        saveData(db, true, `تمت الموافقة على المساعد الجديد (${u.name}) وتفعيل حسابه!`);
+        renderTeacherDash();
+        showToast('تمت الموافقة على المساعد وتفعيله بنجاح!');
+      }
+    }
+
+    function approveStudentByTeacher(studentId) {
+      const db = getData();
+      const u = db.users.find(x => x.id === studentId);
+      if (u) {
+        u.assistantApproved = true;
+        saveData(db, true, `تمت الموافقة على الطالب (${u.name}) وتنشيط حسابه!`);
+        renderTeacherDash();
+        showToast('تمت الموافقة على الطالب وتفعيله بنجاح بواسطة المعلم!');
+      }
+    }
+
+    function deleteAssistantByTeacher(assistantId) {
+      if (!confirm('هل أنت تأكد من حذف هذا المساعد نهائياً؟')) return;
+      const db = getData();
+      db.users = db.users.filter(u => u.id !== assistantId);
+      saveData(db, true, 'تم حذف أحد المساعدين من المنصة');
+      renderTeacherDash();
+      showToast('تم حذف المساعد بنجاح!');
+    }
+
+    function deleteUserByTeacherOrAssistant(userId) {
+      if (!confirm('هل أنت تأكد من حذف هذا المستخدم من منصتك؟')) return;
+      const db = getData();
+      db.users = db.users.filter(u => u.id !== userId);
+      saveData(db, true, 'تم تحديث قائمة الطلاب والحسابات');
+      if (currentUser.role === 'teacher') renderTeacherDash();
+      if (currentUser.role === 'assistant') renderAssistantDash();
+      showToast('تم حذف المستخدم بنجاح!');
+    }
+
+    // ASSISTANT DASHBOARD
+    function renderAssistantDash() {
+      const db = getData();
+
+      const latestAssUser = db.users.find(u => u.id === currentUser.id) || currentUser;
+
+      const pendingBox = document.getElementById('assistantPendingStatusBox');
+      const mainContent = document.getElementById('assistantMainContent');
+
+      if (!latestAssUser.teacherApproved) {
+        pendingBox.classList.remove('hidden');
+        mainContent.classList.add('hidden');
+        document.getElementById('assistantTotalStudents').innerText = '0';
+        return;
+      } else {
+        pendingBox.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+      }
+
+      // Pending Students List (For Assistant ONLY)
+      const pendingStud = db.users.filter(u => u.role === 'student' && (u.teacherIds && u.teacherIds.includes(currentUser.teacherId) || u.teacherId === currentUser.teacherId) && !u.assistantApproved);
+      const pendingList = document.getElementById('assistantPendingStudentsList');
+      pendingList.innerHTML = pendingStud.length === 0 ? '<p class="text-gray-400 text-sm">لا توجد طلبات قبول طلاب معلقة.</p>' : '';
+
+      pendingStud.forEach(s => {
+        pendingList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-amber-50/60 rounded-xl border border-amber-200">
+            <div>
+              <span class="font-bold text-gray-800">${s.name}</span>
+              <span class="text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full mr-2">${s.grade || 'غير محدد'}</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="approveStudentByAssistant('${s.id}')" class="bg-teal-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">موافقة وتفعيل</button>
+              <button onclick="deleteUserByTeacherOrAssistant('${s.id}')" class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">رفض وحذف</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Active Students List for Assistant
+      const activeStud = db.users.filter(u => u.role === 'student' && (u.teacherIds && u.teacherIds.includes(currentUser.teacherId) || u.teacherId === currentUser.teacherId) && u.assistantApproved);
+      const activeList = document.getElementById('assistantActiveStudentsList');
+      activeList.innerHTML = activeStud.length === 0 ? '<p class="text-gray-400 text-sm">لا يوجد طلاب مفعلون حالياً.</p>' : '';
+
+      activeStud.forEach(s => {
+        activeList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
+            <div>
+              <span class="font-bold text-gray-800">${s.name}</span>
+              <span class="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full mr-2">${s.grade || 'غير محدد'}</span>
+            </div>
+            <button onclick="deleteUserByTeacherOrAssistant('${s.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">حذف الطالب</button>
+          </div>
+        `;
+      });
+
+      document.getElementById('assistantTotalStudents').innerText = activeStud.length;
+    }
+
+    function approveStudentByAssistant(id) {
+      const db = getData();
+      const assUser = db.users.find(u => u.id === currentUser.id);
+
+      if (assUser && !assUser.teacherApproved) {
+        return alert('غير مسموح لك بقبول الطلاب قبل أن يوافق المعلم على حسابك أولاً!');
+      }
+
+      const u = db.users.find(x => x.id === id);
+      if (u) {
+        u.assistantApproved = true;
+        saveData(db, true, `قام المساعد بموافقة وتفعيل الطالب (${u.name})!`);
+        renderAssistantDash();
+        showToast('تمت الموافقة على الطالب وتفعيل حسابه بنجاح!');
+      }
+    }
+
+    // CONTENT & EXAM DELETION / MANAGEMENT
+    function renderManageContentAndExams() {
+      const db = getData();
+      const targetTeacherId = currentUser.role === 'teacher' ? currentUser.id : currentUser.teacherId;
+
+      // 1. Content Management List
+      const contentList = document.querySelectorAll('#staffContentManageList');
+      contentList.forEach(container => {
+        const contents = db.contents.filter(c => c.teacherId === targetTeacherId);
+        container.innerHTML = contents.length === 0 ? '<p class="text-gray-400 text-sm col-span-2">لا يوجد محتوى منشور حالياً.</p>' : '';
+
+        contents.forEach(c => {
+          container.innerHTML += `
+            <div class="p-3 bg-gray-50 rounded-xl border flex flex-col justify-between gap-2">
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-sm text-gray-800">${c.title}</span>
+                  <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">${c.grade}</span>
+                </div>
+                <span class="text-xs text-gray-500">الناشر: ${c.publisherName} (${c.type === 'video' ? 'فيديو' : 'صورة'})</span>
+              </div>
+              <button onclick="deleteContent('${c.id}')" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-1.5 rounded-lg text-xs flex items-center justify-center gap-1">
+                <i class="fa-solid fa-trash"></i> حذف هذا المحتوى
+              </button>
+            </div>
+          `;
+        });
+      });
+
+      // 2. Exams Management List
+      const examsList = document.querySelectorAll('#staffExamsManageList');
+      examsList.forEach(container => {
+        const exams = db.exams.filter(e => e.teacherId === targetTeacherId);
+        container.innerHTML = exams.length === 0 ? '<p class="text-gray-400 text-sm">لا توجد امتحانات منشورة حالياً.</p>' : '';
+
+        exams.forEach(ex => {
+          container.innerHTML += `
+            <div class="p-3 bg-gray-50 rounded-xl border flex items-center justify-between gap-2">
+              <div>
+                <span class="font-bold text-sm text-indigo-900">${ex.title}</span>
+                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold mr-2">${ex.grade}</span>
+                <span class="text-xs text-gray-500 block">الناشر: ${ex.publisherName}</span>
+              </div>
+              <button onclick="deleteExam('${ex.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
+                <i class="fa-solid fa-trash"></i> حذف الامتحان
+              </button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function deleteContent(contentId) {
+      if (!confirm('هل أنت تأكد من حذف هذا المحتوى نهائياً؟')) return;
+      const db = getData();
+      db.contents = db.contents.filter(c => c.id !== contentId);
+      saveData(db, true, 'تم حذف درس/محتوى تعليمي من المنصة');
+      renderManageContentAndExams();
+      showToast('تم حذف المحتوى بنجاح!');
+    }
+
+    function deleteExam(examId) {
+      if (!confirm('هل أنت تأكد من حذف هذا الامتحان نهائياً؟')) return;
+      const db = getData();
+      db.exams = db.exams.filter(e => e.id !== examId);
+      saveData(db, true, 'تم حذف امتحان من المنصة');
+      renderManageContentAndExams();
+      showToast('تم حذف الامتحان بنجاح!');
+    }
+
+    // TABS LOGIC
+    function switchStaffTab(tab) {
+      ['staffApprovalsSection', 'staffContentSection', 'staffExamsSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      if (tab === 'approvals') document.getElementById('staffApprovalsSection').classList.remove('hidden');
+      if (tab === 'content') {
+        document.getElementById('staffContentSection').classList.remove('hidden');
+        renderManageContentAndExams();
+      }
+      if (tab === 'exams') {
+        document.getElementById('staffExamsSection').classList.remove('hidden');
+        renderManageContentAndExams();
+      }
+    }
+
+    function switchAssistantTab(tab) {
+      ['assStudentsSection', 'assContentSection', 'assExamsSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      if (tab === 'students') document.getElementById('assStudentsSection').classList.remove('hidden');
+      if (tab === 'content') {
+        const assCont = document.getElementById('assContentSection');
+        assCont.innerHTML = document.getElementById('staffContentSection').innerHTML;
+        assCont.classList.remove('hidden');
+        renderManageContentAndExams();
+      }
+      if (tab === 'exams') {
+        const assExams = document.getElementById('assExamsSection');
+        assExams.innerHTML = document.getElementById('staffExamsSection').innerHTML;
+        assExams.classList.remove('hidden');
+        renderManageContentAndExams();
+        resetExamBuilder();
+      }
+    }
+
+    // DYNAMIC EXAM BUILDER LOGIC
+    let qIndexCounter = 0;
+
+    function resetExamBuilder() {
+      const containers = document.querySelectorAll('#questionsContainer');
+      containers.forEach(c => {
+        c.innerHTML = '';
+        qIndexCounter = 0;
+        addQuestionToFormContainer(c);
+      });
+    }
+
+    function addQuestionToForm() {
+      const containers = document.querySelectorAll('#questionsContainer');
+      containers.forEach(c => addQuestionToFormContainer(c));
+    }
+
+    function addQuestionToFormContainer(container) {
+      qIndexCounter++;
+      const qId = 'q_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const qBox = document.createElement('div');
+      qBox.className = 'q-block p-5 border rounded-2xl bg-gray-50 space-y-4 shadow-sm relative border-gray-200';
+      qBox.id = qId;
+
+      qBox.innerHTML = `
+        <div class="flex justify-between items-center">
+          <h4 class="font-bold text-indigo-900 text-sm">السؤال (${container.children.length + 1})</h4>
+          <button type="button" onclick="removeQuestion('${qId}')" class="text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded">
+            <i class="fa-solid fa-trash"></i> حذف السؤال
+          </button>
+        </div>
+
+        <input type="text" placeholder="اكتب نص السؤال هنا..." required class="question-text w-full p-3 border rounded-xl font-bold bg-white">
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-gray-600">الخيارات (ضع علامة صح أمام الإجابة/الإجابات الصحيحة):</label>
+          <div class="options-container space-y-2"></div>
+          <button type="button" onclick="addOptionToQuestion('${qId}')" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <i class="fa-solid fa-plus"></i> إضافة خيار
+          </button>
+        </div>
+      `;
+
+      container.appendChild(qBox);
+      addOptionToQuestion(qId);
+      addOptionToQuestion(qId);
+    }
+
+    function removeQuestion(qId) {
+      const el = document.getElementById(qId);
+      if (el) el.remove();
+    }
+
+    function addOptionToQuestion(qId) {
+      const qBlock = document.getElementById(qId);
+      if (!qBlock) return;
+      const optContainer = qBlock.querySelector('.options-container');
+      const optIndex = optContainer.children.length;
+
+      const optRow = document.createElement('div');
+      optRow.className = 'option-row flex items-center gap-2';
+      optRow.innerHTML = `
+        <input type="checkbox" class="is-correct h-5 w-5 text-indigo-600 rounded cursor-pointer" title="إجابة صحيحة">
+        <input type="text" placeholder="خيار ${optIndex + 1}" required class="option-text flex-1 p-2 border rounded-lg text-sm bg-white">
+        <button type="button" onclick="removeOption(this)" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-times"></i></button>
+      `;
+      optContainer.appendChild(optRow);
+    }
+
+    function removeOption(btn) {
+      const row = btn.closest('.option-row');
+      row.remove();
+    }
+
+    // PUBLISHING HANDLERS
+    function handleUploadContent(e) {
+      e.preventDefault();
+
+      const db = getData();
+      if (currentUser.role === 'assistant') {
+        const assUser = db.users.find(u => u.id === currentUser.id);
+        if (!assUser || !assUser.teacherApproved) {
+          return alert('غير مسموح لك بنشر أي محتوى قبل أن يوافق المعلم على طلب انضمامك أولاً!');
+        }
+      }
+
+      const form = e.target;
+      const title = form.querySelector('#contentTitle').value;
+      const type = form.querySelector('#contentType').value;
+      const grade = form.querySelector('#contentGrade').value;
+      const fileInput = form.querySelector('#contentFile');
+
+      if (!fileInput.files || !fileInput.files[0]) return alert('يرجى اختيار ملف!');
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const targetTeacherId = currentUser.role === 'teacher' ? currentUser.id : currentUser.teacherId;
+
+        db.contents.push({
+          id: 'c_' + Date.now(),
+          teacherId: targetTeacherId,
+          publisherName: currentUser.name,
+          publisherRole: currentUser.role,
+          title: title,
+          type: type,
+          grade: grade,
+          src: evt.target.result
+        });
+
+        saveData(db, true, `تم نشر درس جديد: (${title}) لمرحلة (${grade})!`);
+
+        showToast(`تم نشر (${type === 'video' ? 'فيديو' : 'صورة'}) لمرحلة (${grade}) بنجاح!`);
+        form.reset();
+        renderManageContentAndExams();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    function handleCreateExam(e) {
+      e.preventDefault();
+
+      const db = getData();
+      if (currentUser.role === 'assistant') {
+        const assUser = db.users.find(u => u.id === currentUser.id);
+        if (!assUser || !assUser.teacherApproved) {
+          return alert('غير مسموح لك بإنشاء أو نشر امتحانات قبل أن يوافق المعلم على طلب انضمامك أولاً!');
+        }
+      }
+
+      const form = e.target;
+      const title = form.querySelector('#examTitle').value.trim();
+      const grade = form.querySelector('#examGrade').value;
+      const qBlocks = form.querySelectorAll('.q-block');
+
+      if (!title) return alert('يرجى إدخال عنوان الامتحان!');
+      if (qBlocks.length === 0) return alert('يرجى إضافة سؤال واحد على الأقل!');
+
+      const questionsData = [];
+      for (let i = 0; i < qBlocks.length; i++) {
+        const block = qBlocks[i];
+        const qText = block.querySelector('.question-text').value.trim();
+        const optionRows = block.querySelectorAll('.option-row');
+
+        const options = [];
+        const correctIndices = [];
+
+        optionRows.forEach((row, idx) => {
+          const val = row.querySelector('.option-text').value.trim();
+          const isCorrect = row.querySelector('.is-correct').checked;
+          options.push(val);
+          if (isCorrect) correctIndices.push(idx);
+        });
+
+        questionsData.push({
+          text: qText,
+          options: options,
+          correctIndices: correctIndices
+        });
+      }
+
+      const targetTeacherId = currentUser.role === 'teacher' ? currentUser.id : currentUser.teacherId;
+
+      db.exams.push({
+        id: 'ex_' + Date.now(),
+        teacherId: targetTeacherId,
+        publisherName: currentUser.name,
+        publisherRole: currentUser.role,
+        title: title,
+        grade: grade,
+        questions: questionsData
+      });
+
+      saveData(db, true, `تم نشر امتحان جديد: (${title}) لمرحلة (${grade})!`);
+
+      showToast(`تم نشر امتحان بعنوان "${title}" لمرحلة (${grade}) بنجاح!`);
+      form.reset();
+      resetExamBuilder();
+      renderManageContentAndExams();
+    }
+
+    // STUDENT DASHBOARD & REQUEST NEW TEACHER
+    function populateStudentDashTeacherSelect() {
+      const db = getData();
+      const subject = document.getElementById('studentDashSubjectSelect').value;
+      const select = document.getElementById('studentDashTeacherSelect');
+
+      select.innerHTML = '';
+      if (!subject) return;
+
+      const matchingTeachers = db.users.filter(u => u.role === 'teacher' && u.adminApproved && u.subjects && u.subjects.includes(subject));
+
+      if (matchingTeachers.length === 0) {
+        select.innerHTML = '<option value="">لا يوجد معلمون لهذه المادة</option>';
+      } else {
+        matchingTeachers.forEach(t => {
+          select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+        });
+      }
+    }
+
+    function sendNewTeacherRequest() {
+      const teacherId = document.getElementById('studentDashTeacherSelect').value;
+      if (!teacherId) return alert('يرجى اختيار معلم إرسال الطلب إليه!');
+
+      const db = getData();
+      const student = db.users.find(u => u.id === currentUser.id);
+
+      if (student) {
+        if (!student.teacherIds) student.teacherIds = [];
+        if (student.teacherIds.includes(teacherId)) {
+          return alert('أنت مسجل بالفعل مع هذا المعلم أو قمت بإرسال طلب سابقاً!');
+        }
+
+        const hasAssistant = teacherHasAssistants(db, teacherId);
+
+        student.teacherIds.push(teacherId);
+        if (!hasAssistant) {
+          student.assistantApproved = true;
+        }
+
+        currentUser = student;
+        saveData(db, true, `طلب انضمام جديد من الطالب (${student.name})`);
+
+        if (!hasAssistant) {
+          alert('تم إضافة المعلم وتفعيل حسابك معه تلقائياً بنجاح (لعدم وجود مساعدين للمعلم)!');
+        } else {
+          alert('تم إرسال طلب الانضمام للمعلم بنجاح وبانتظار تفعيله من المساعد أو المعلم!');
+        }
+
+        renderStudentDash();
+      }
+    }
+
+    function renderStudentDash() {
+      const db = getData();
+      const statusCard = document.getElementById('studentStatusCard');
+
+      if (!currentUser.assistantApproved) {
+        statusCard.innerHTML = `<div class="text-amber-800 bg-amber-50 p-4 rounded-xl border border-amber-200 font-bold flex items-center gap-2"><i class="fa-solid fa-clock text-amber-600"></i> حسابك قيد المراجعة وبانتظار موافقة المعلم/المساعد للتمكن من مشاهدة باقي المحتوى والامتحانات.</div>`;
+      } else {
+        statusCard.innerHTML = `<div class="text-emerald-700 bg-emerald-50 p-4 rounded-xl border border-emerald-200 font-bold flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600"></i> تعرّض الآن الدروس والامتحانات الموجهة لمرحلتك (${currentUser.grade || 'جميع المراحل'}).</div>`;
+      }
+
+      const myTeachers = currentUser.teacherIds || (currentUser.teacherId ? [currentUser.teacherId] : []);
+
+      // Lessons List Filtered by Teachers and Grade
+      const lessonsList = document.getElementById('studentLessonsList');
+      const studentGrade = currentUser.grade;
+      const contents = db.contents.filter(c => myTeachers.includes(c.teacherId) && (c.grade === 'جميع المراحل' || c.grade === studentGrade));
+
+      lessonsList.innerHTML = contents.length === 0 ? '<p class="text-gray-400 text-sm col-span-2">لا توجد دروس مرفوعة لمرحلتك الدراسية حالياً لدى المعلمين المسجل معهم.</p>' : '';
+
+      contents.forEach(c => {
+        lessonsList.innerHTML += `
+          <div class="bg-white p-4 rounded-xl shadow border space-y-2">
+            <div class="flex justify-between items-center">
+              <h4 class="font-bold text-gray-800">${c.title}</h4>
+              <span class="text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full font-bold">${c.grade}</span>
+            </div>
+            <p class="text-xs text-gray-500">الناشر: ${c.publisherName}</p>
+            ${c.type === 'video' ? `<video src="${c.src}" controls class="w-full rounded-lg max-h-60 bg-black"></video>` : `<img src="${c.src}" class="w-full rounded-lg max-h-60 object-cover">`}
+          </div>
+        `;
+      });
+
+      // Exams List Filtered by Teachers and Grade
+      const examsList = document.getElementById('studentExamsList');
+      const exams = db.exams.filter(e => myTeachers.includes(e.teacherId) && (e.grade === 'جميع المراحل' || e.grade === studentGrade));
+
+      examsList.innerHTML = '<h3 class="font-bold text-lg mb-2">الامتحانات المتاحة لمرحلتك</h3>';
+
+      if (exams.length === 0) examsList.innerHTML += '<p class="text-gray-400 text-sm">لا توجد امتحانات متاحة لمرحلتك الدراسية حالياً لدى المعلمين المسجل معهم.</p>';
+
+      exams.forEach(ex => {
+        examsList.innerHTML += `
+          <div class="p-4 bg-gray-50 rounded-xl border flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-indigo-900">${ex.title}</span>
+                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">${ex.grade}</span>
+              </div>
+              <span class="text-xs text-gray-500 block">الناشر: ${ex.publisherName} | عدد الأسئلة: ${ex.questions ? ex.questions.length : 0}</span>
+            </div>
+            <button onclick="openExamModal('${ex.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-bold">بدء الامتحان</button>
+          </div>
+        `;
+      });
+    }
+
+    function openExamModal(examId) {
+      const db = getData();
+      const ex = db.exams.find(e => e.id === examId);
+      if (!ex) return;
+
+      activeExamTaking = ex;
+      document.getElementById('modalExamTitle').innerText = ex.title;
+
+      const body = document.getElementById('modalExamBody');
+      body.innerHTML = '';
+
+      ex.questions.forEach((q, qIdx) => {
+        let optsHtml = '';
+        q.options.forEach((opt, oIdx) => {
+          optsHtml += `
+            <label class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl border hover:bg-indigo-50 cursor-pointer">
+              <input type="checkbox" name="exam_q_${qIdx}" value="${oIdx}" class="h-5 w-5 text-indigo-600 rounded">
+              <span class="text-sm font-semibold">${opt}</span>
+            </label>
+          `;
+        });
+
+        body.innerHTML += `
+          <div class="p-4 border rounded-2xl bg-white space-y-3">
+            <p class="font-bold text-gray-800">${qIdx + 1}. ${q.text}</p>
+            <div class="space-y-2">${optsHtml}</div>
+          </div>
+        `;
+      });
+
+      document.getElementById('examModal').classList.remove('hidden');
+    }
+
+    function closeExamModal() {
+      document.getElementById('examModal').classList.add('hidden');
+      activeExamTaking = null;
+    }
+
+    function submitExamAnswers() {
+      if (!activeExamTaking) return;
+
+      let score = 0;
+      const total = activeExamTaking.questions.length;
+
+      activeExamTaking.questions.forEach((q, qIdx) => {
+        const checkedInputs = document.querySelectorAll(`input[name="exam_q_${qIdx}"]:checked`);
+        const userSelected = Array.from(checkedInputs).map(i => parseInt(i.value)).sort();
+        const correct = (q.correctIndices || []).slice().sort();
+
+        if (JSON.stringify(userSelected) === JSON.stringify(correct)) {
+          score++;
+        }
+      });
+
+      closeExamModal();
+      alert(`🎉 تم إنهاء الامتحان!\n\nدرجتك النهائية: ${score} من ${total}`);
+    }
+    </script>
+</body>
+</html>
